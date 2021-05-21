@@ -1,0 +1,348 @@
+---
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+# 1. Defining the Question
+### a) Specifying the Data Analytic Question
+
+> Identify which individuals are most likely to click on ads from a cryptography course website
+
+### b) Defining the Metric for Success
+
+> For this sttudy, we will perform conclusive Exploratory Data Analysis to enable us identify individuals who are most likely to click on ads.
+
+### c) Understanding the context
+
+> A Kenyan entrepreneur has created an online cryptography course and would want to advertise it on her blog. She currently targets audiences originating from various countries. In the past, she ran ads to advertise a related course on the same blog and collected data in the process. Using the data previously collected, she is looking to do a study to identify which individuals are most likely to click on her ads.
+
+### d) Data Relevance
+
+> Data is provided was collected in the past but from the same blog hence it is very suitable for this study.
+
+> Definition of Variables Daily Time Spent on Site
+
+> Age
+
+> Area Income
+
+> Daily Internet Usage
+
+> Ad Topic Line
+
+> City
+
+> Male
+
+> Country
+
+> Timestamp
+
+> Clicked on Ad
+
+# Reading the data
+```{r}
+library("data.table")
+ads <- fread('http://bit.ly/IPAdvertisingData')
+head(ads)
+```
+
+```{r}
+## Checking the summary
+summary(ads)
+```
+
+```{r}
+# checking the dimension/shape of the data
+dim(ads) # 1000 rows and 10 columns
+```
+```{r}
+#Change datatypes
+ads$Male <- as.factor(ads$Male)
+# 
+#Checking datatypes
+sapply(ads, class)
+```
+# Data cleaning
+## Missing values
+```{r}
+# checking for missing values
+sum(is.na(ads))# there are no missing values in the data
+```
+```{r}
+# displaying all rows from the dataset which don't contain any missing values
+na.omit(ads)
+```
+
+## Duplicates
+```{r}
+library(tidyverse)
+```
+
+```{r}
+# Checking the number of duplicates
+duplicated_rows <- ads[duplicated(ads),]
+duplicated_rows # there are no duplicates in the data
+```
+# Data checking
+```{r}
+# Datatypes
+sapply(ads,class)
+
+```
+# Checking for outliers
+```{r}
+#Checking for outliers
+#First we select numeric columns excluding male and clicked.on.ad since they are binary column
+
+ads_df <- subset(ads, select = -c(`Ad Topic Line`,City,	Male,	Country,	Timestamp,	`Clicked on Ad`))
+head(ads_df)
+```
+```{r}
+# Then use the function boxplot.stats which lists the outliers in the vectors
+# ---
+#
+options(repr.plot.width = 14, repr.plot.height = 14)
+boxplot(ads$`Area Income`,
+        col = "navyblue")
+# Add a title
+title("Income Distribution")
+```
+```{r}
+# Then use the function boxplot.stats which lists the outliers in the vectors
+# ---
+#
+options(repr.plot.width = 14, repr.plot.height = 10)
+boxplot(ads$`Age`,
+        col = "navyblue")
+# Add a title
+title("Age Distribution")
+```
+```{r}
+# Then use the function boxplot.stats which lists the outliers in the vectors
+# ---
+#
+options(repr.plot.width = 14, repr.plot.height = 14)
+boxplot(ads$`Daily Internet Usage`,
+        col = "navyblue")
+# Add a title
+title("Internet usage Distribution")
+```
+```{r}
+# Then use the function boxplot.stats which lists the outliers in the vectors
+# ---
+#
+options(repr.plot.width = 10, repr.plot.height = 10)
+boxplot(ads$`Daily Time Spent on Site`,
+        col = "navyblue")
+# Add a title
+title("Time spent Distribution")
+```
+```{r}
+class(ads)
+```
+```{r}
+str(ads)
+```
+```{r}
+library(tidyverse)
+library(DataExplorer)
+glimpse(ads)
+```
+```{r}
+options(repr.plot.width = 10, repr.plot.height = 10)
+plot_intro(ads)
+```
+
+
+# Exploratory Data Analysis
+## Univariate analysis
+##### Measures of central tendency 
+```{r}
+# descriptive statistics
+# these summaries will provide us with the measures of central tendencies of the numerical columns
+summary(ads)
+
+```
+###### Age
+```{r}
+# Finding the mode of age
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
+ads.Age.mode <- getmode(ads$Age)
+ads.Age.mode
+
+```
+```{r}
+# Finding the median of age
+ads.Age.median <- median(ads$Age)
+ads.Age.median 
+
+```
+
+## Univariate graphical
+
+```{r}
+ggplot(ads, aes(x = `Daily Time Spent on Site`)) +
+  geom_histogram(fill = "cornflowerblue", 
+                 color = "white",bins = 20) + 
+  theme_classic() +                                  # use a minimal theme
+  labs(title="Website visitors by Time spent",
+       x = "Daily Time SPent on Site")
+
+```
+
+```{r}
+
+ggplot(ads, aes(x = Age)) +
+  geom_histogram(fill = "cornflowerblue", 
+                 color = "white",bins = 20) + 
+  theme_classic() +                                  # use a minimal theme
+  labs(title="Website visitors by Age",
+       x = "Age")
+```
+
+```{r}
+library(ggplot2)                                     # for visualization
+ggplot(ads, aes(x = `Area Income`)) +
+  geom_histogram(fill = "cornflowerblue", 
+                 color = "white",bins = 20) + 
+  theme_classic() +                                  # use a minimal theme
+  labs(title="Website visitors by Area Income",
+       x = "Area Income")
+```
+
+```{r}
+library(ggplot2)                                     # for visualization
+ggplot(ads, aes(x = `Daily Internet Usage`)) +
+  geom_histogram(fill = "cornflowerblue", 
+                 color = "white",bins = 20) + 
+  theme_classic() +                                  # use a minimal theme
+  labs(title="Website visitors by Internet usage",
+       x = "Daily Internet Usage")
+```
+
+```{r}
+library(ggplot2)                                     # for visualization
+ggplot(ads, aes(x = Age)) +
+  geom_density(fill = "indianred3") +
+  theme_minimal() +                                  # use a minimal theme
+  labs(title = "Website Visitors Age")
+```
+
+
+
+
+
+
+ 
+> Age: Most people who visit the blog are between 25 and 40 years, data is skewed to the right of the mean. Graph doesn't show a sharp peak
+> Income: Data on income is mostly skewed to the right of the 55,00 mean
+> Time spent on site: There are lots of variations on how much time people spend on the site. A good number does spend between 65 and 85 time on the site.
+
+###### Categorical data
+```{r}
+#Which gender is mainly active on the blog?
+ggplot(data = ads) +
+  geom_bar(mapping = aes(x = Male))
+
+#Assuming that if male = 1 then we can conclude that more females
+# frequent the blog more as compared to males
+```
+
+```{r}
+
+#Do most people clickon ads or not?
+ggplot(data = ads) +
+  geom_bar(mapping = aes(x = `Clicked on Ad`))
+
+#There is a balance between the people who click on ads and those who don't
+#We can coclude that half of the people who visit the website will probably click on an ad
+```
+## Bivariate analysis and Mulitivariate analysis
+```{r}
+
+x <- ads$`Daily Internet Usage`
+y <-  ads$`Daily Time Spent on Site`
+# Plot with main and axis titles
+# Change point shape (pch = 19) and remove frame.
+plot(x, y, main = "Time spent on site vs Daily Internet Usage",
+     xlab = "Daily Internet Usage", ylab = "Time sspent on site",
+     pch = 20)
+```
+
+
+
+
+
+
+
+> The points are all over but our data points are not highly correlated which explains this. But we can see that people who spend less time on site use less internet. Also, most of the people who use alot of internet per day seem to spend a considerable amount of time on the site.
+> This is a good sign for the business
+
+##### Explore which individuals are most likely to click an ad
+```{r}
+#Who is likely to click on an ad, female or male?
+library(ggplot2)
+
+# stacked bar chart
+ggplot(ads, 
+       aes(x = `Clicked on Ad`, 
+           fill = Male)) + 
+  geom_bar(position = "stack")
+```
+
+
+
+> From above graph, we can see that female(where male=0), is slightly more likely to click on an ad that male.
+> But also from earlier analysis, it is important to note that females are slightly more frequent on the blog than male.
+
+```{r}
+
+x <- ads$`Area Income`
+y <- ads$`Daily Time Spent on Site`
+ggplot(ads,aes(x,y,color=`Male`))+geom_point(alpha=0.5)
+```
+```{r}
+# finding the correlation
+#rquery.cormat(df1, type="full")
+res <- cor(ads_df)
+round(res, 2)
+```
+```{r}
+# Scatter Plot for Time vs Income based on adclicks
+
+library(ggthemes)
+library(ggplot2)
+options(repr.plot.width = 10, repr.plot.height = 10)
+ggplot(data = ads, mapping = aes(`Area Income` , `Daily Time Spent on Site`)) +
+    geom_point(alpha = 10, aes(color = `Clicked on Ad`)) + theme_gdocs() +
+     labs(title = "Time vs Income based on Adclick",
+     x = "Area Income", y = "Time Spent on Site")
+
+```
+```{r}
+library(corrplot)
+library(DataExplorer)
+options(repr.plot.width = 20, repr.plot.height = 20)
+plot_correlation(ads, type = 'c',cor_args = list( 'use' = 'complete.obs'))
+```
+
+
+
+### 6. Conclusion
+
+> People who have a daily internet usage of less than 175 are more likely to click on an ad
+> People who spend less than 70mins on the site are likely to click on ad
+> People above 40 are more likely to click on an ad
+> People with an income of less than 60000 are most likely to click on an ad
+The female gender is likely to click on ad
+
+### 7. Challenging the solution
+> It would be great to do some hypothesis testing on the conclusions made from Exploratory Data Analysis, this way we could ascertain the chances of specific person clicking on an ad or not.
+> Also, it would be necessary to create a predictive model and perform some feature importance selection to choose which variables are most important to use when deciding who will click on an ad or not when using the website.
